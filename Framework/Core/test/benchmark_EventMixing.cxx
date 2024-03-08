@@ -25,11 +25,9 @@ using namespace o2::soa;
 // Validation of new event mixing: time complexity same as for naive loop
 
 #ifdef __APPLE__
-constexpr unsigned int maxPairsRange = 5;
-constexpr unsigned int maxFivesRange = 3;
+constexpr unsigned int maxPairsRange = 8;
 #else
-constexpr unsigned int maxPairsRange = 5;
-constexpr unsigned int maxFivesRange = 3;
+constexpr unsigned int maxPairsRange = 8;
 #endif
 constexpr int numEventsToMix = 5;
 constexpr int numTracksPerEvent = 10000;
@@ -126,7 +124,7 @@ static void BM_EventMixingTraditional(benchmark::State& state)
   state.SetBytesProcessed(state.iterations() * sizeof(float) * count);
 }
 
-BENCHMARK(BM_EventMixingTraditional)->RangeMultiplier(2)->Range(4, 8 << maxPairsRange);
+BENCHMARK(BM_EventMixingTraditional)->RangeMultiplier(2)->Range(4, 2 << maxPairsRange);
 
 static void BM_EventMixingCombinations(benchmark::State& state)
 {
@@ -196,6 +194,6 @@ static void BM_EventMixingCombinations(benchmark::State& state)
   state.SetBytesProcessed(state.iterations() * sizeof(float) * count);
 }
 
-BENCHMARK(BM_EventMixingCombinations)->RangeMultiplier(2)->Range(4, 8 << maxPairsRange);
+BENCHMARK(BM_EventMixingCombinations)->RangeMultiplier(2)->Range(4, 2 << maxPairsRange);
 
 BENCHMARK_MAIN();
