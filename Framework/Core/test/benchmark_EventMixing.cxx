@@ -64,7 +64,7 @@ static void BM_EventMixingTraditional(benchmark::State& state)
   }
   auto tableCol = colBuilder.finalize();
   o2::aod::Collisions collisions{tableCol};
-  std::uniform_int_distribution<int> uniform_dist_col_ind(0, collisions.size());
+  std::uniform_int_distribution<int> uniform_dist_col_ind(0, collisions.size() - 1);
 
   auto rowWriterTrack = trackBuilder.cursor<o2::aod::StoredTracks>();
   for (auto i = 0; i < numTracksPerEvent * state.range(0); ++i) {
@@ -76,13 +76,13 @@ static void BM_EventMixingTraditional(benchmark::State& state)
   auto tableTrack = trackBuilder.finalize();
   o2::aod::StoredTracks tracks{tableTrack};
 
-  ArrowTableSlicingCache atscache({{getLabelFromType<o2::aod::StoredTracks>(), "fIndex" + cutString(getLabelFromType<o2::aod::Collisions>())}});
-  auto s = atscache.updateCacheEntry(0, tableTrack);
-  SliceCache cache{&atscache};
-
   int64_t count = 0;
   int64_t colCount = 0;
   int nBinsTot = (xBins.size() - 2) * (yBins.size() - 2);
+
+  ArrowTableSlicingCache atscache({{getLabelFromType<o2::aod::StoredTracks>(), "fIndex" + cutString(getLabelFromType<o2::aod::Collisions>())}});
+  auto s = atscache.updateCacheEntry(0, tableTrack);
+  SliceCache cache{&atscache};
 
   for (auto _ : state) {
     count = 0;
@@ -155,7 +155,7 @@ static void BM_EventMixingCombinations(benchmark::State& state)
   }
   auto tableCol = colBuilder.finalize();
   o2::aod::Collisions collisions{tableCol};
-  std::uniform_int_distribution<int> uniform_dist_col_ind(0, collisions.size());
+  std::uniform_int_distribution<int> uniform_dist_col_ind(0, collisions.size() - 1);
 
   auto rowWriterTrack = trackBuilder.cursor<o2::aod::StoredTracks>();
   for (auto i = 0; i < numTracksPerEvent * state.range(0); ++i) {
@@ -169,6 +169,7 @@ static void BM_EventMixingCombinations(benchmark::State& state)
 
   int64_t count = 0;
   int64_t colCount = 0;
+
   ArrowTableSlicingCache atscache{{{getLabelFromType<o2::aod::StoredTracks>(), "fIndex" + getLabelFromType<o2::aod::Collisions>()}}};
   auto s = atscache.updateCacheEntry(0, tableTrack);
   SliceCache cache{&atscache};
