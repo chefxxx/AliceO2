@@ -27,7 +27,6 @@ namespace test
 DECLARE_SOA_COLUMN_FULL(X, x, float, "x");
 DECLARE_SOA_COLUMN_FULL(Y, y, float, "y");
 DECLARE_SOA_COLUMN_FULL(Z, z, float, "z");
-DECLARE_SOA_DYNAMIC_COLUMN(Sum, sum, [](float x, float y) { return x + y; });
 } // namespace test
 
 #ifdef __APPLE__
