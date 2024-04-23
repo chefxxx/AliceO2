@@ -26,10 +26,10 @@ using namespace o2::soa;
 
 #ifdef __APPLE__
 constexpr unsigned int maxPairsRange = 8;
-constexpr unsigned int maxColPairsRange = 13;
+constexpr unsigned int maxColPairsRange = 21;
 #else
 constexpr unsigned int maxPairsRange = 8;
-constexpr unsigned int maxColPairsRange = 15;
+constexpr unsigned int maxColPairsRange = 23;
 #endif
 constexpr int numEventsToMix = 5;
 constexpr int numTracksPerEvent = 10000;
