@@ -249,7 +249,7 @@ static void BM_EventMixingNaiveCollisionsPairsSameCategories(benchmark::State& s
         for (auto& col2 : mixingBuffer) {
           colCount++;
         }
-        if (mixingBuffer.size() >= numEventsToMix) {
+        if (mixingBuffer.size() >= numEventsToMix - 1) {
           mixingBuffer.pop_back();
         }
       }
