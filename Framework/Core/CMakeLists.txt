@@ -337,6 +337,7 @@ foreach(b
         ASoA
         ASoAHelpers
         EventMixing
+        EventMixingParts
         HistogramRegistry
         TableToTree
         TreeToTable
