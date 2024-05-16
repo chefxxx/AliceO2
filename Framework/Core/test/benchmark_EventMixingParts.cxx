@@ -25,14 +25,11 @@ using namespace o2::soa;
 // Validation of new event mixing: time complexity same as for naive loop
 
 #ifdef __APPLE__
-constexpr unsigned int maxPairsRange = 8;
-constexpr unsigned int maxColPairsRange = 21;
+constexpr unsigned int maxColPairsRange = 25;
 #else
-constexpr unsigned int maxPairsRange = 8;
-constexpr unsigned int maxColPairsRange = 23;
+constexpr unsigned int maxColPairsRange = 25;
 #endif
 constexpr int numEventsToMix = 5;
-constexpr int numTracksPerEvent = 10000;
 
 using namespace o2::framework;
 using namespace o2::soa;
