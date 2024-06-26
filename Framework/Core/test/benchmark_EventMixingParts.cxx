@@ -25,59 +25,59 @@ using namespace o2::soa;
 // Validation of new event mixing: time complexity same as for naive loop
 
 #ifdef __APPLE__
-constexpr unsigned int maxColPairsRange = 25;
+constexpr unsigned int maxColPairsRange = 30;
 #else
-constexpr unsigned int maxColPairsRange = 25;
+constexpr unsigned int maxColPairsRange = 30;
 #endif
 constexpr int numEventsToMix = 5;
 
 using namespace o2::framework;
 using namespace o2::soa;
 
-static void BM_EventMixingTableCreation(benchmark::State& state)
-{
-  for (auto _ : state) {
-    // Seed with a real random value, if available
-    std::default_random_engine e1(1234567891);
-    std::uniform_real_distribution<float> uniform_dist(0.f, 1.f);
-    std::uniform_real_distribution<float> uniform_dist_x(-0.065f, 0.073f);
-    std::uniform_real_distribution<float> uniform_dist_y(-0.320f, 0.360f);
-    std::uniform_int_distribution<int> uniform_dist_int(0, 5);
-
-    TableBuilder colBuilder;
-    auto rowWriterCol = colBuilder.cursor<o2::aod::Collisions>();
-    for (auto i = 0; i < state.range(0); ++i) {
-      float x = uniform_dist_x(e1);
-      float y = uniform_dist_y(e1);
-      rowWriterCol(0, uniform_dist_int(e1),
-                   x, y, uniform_dist(e1),
-                   uniform_dist(e1), uniform_dist(e1), uniform_dist(e1),
-                   uniform_dist(e1), uniform_dist(e1), uniform_dist(e1),
-                   uniform_dist_int(e1), uniform_dist(e1),
-                   uniform_dist_int(e1),
-                   uniform_dist(e1), uniform_dist(e1));
-    }
-    auto tableCol = colBuilder.finalize();
-    o2::aod::Collisions collisions{tableCol};
-  }
-  state.SetBytesProcessed(state.iterations() * (12 * sizeof(float) + sizeof(int64_t) + 3 * sizeof(int)) * state.range(0));
-}
-
-BENCHMARK(BM_EventMixingTableCreation)->RangeMultiplier(2)->Range(4, 2 << maxColPairsRange);
-
-static void BM_EventMixingBinningCreation(benchmark::State& state)
-{
-  std::vector<double> xBins{VARIABLE_WIDTH, -0.064, -0.062, -0.060, 0.066, 0.068, 0.070, 0.072};
-  std::vector<double> yBins{VARIABLE_WIDTH, -0.320, -0.301, -0.300, 0.330, 0.340, 0.350, 0.360};
-
-  for (auto _ : state) {
-    using BinningType = ColumnBinningPolicy<o2::aod::collision::PosX, o2::aod::collision::PosY>;
-    BinningType binningOnPositions{{xBins, yBins}, true}; // true is for 'ignore overflows' (true by default)
-  }
-  state.SetBytesProcessed(state.iterations() * sizeof(float));
-}
-
-BENCHMARK(BM_EventMixingBinningCreation)->RangeMultiplier(2)->Range(4, 2 << maxColPairsRange);
+//static void BM_EventMixingTableCreation(benchmark::State& state)
+//{
+//  for (auto _ : state) {
+//    // Seed with a real random value, if available
+//    std::default_random_engine e1(1234567891);
+//    std::uniform_real_distribution<float> uniform_dist(0.f, 1.f);
+//    std::uniform_real_distribution<float> uniform_dist_x(-0.065f, 0.073f);
+//    std::uniform_real_distribution<float> uniform_dist_y(-0.320f, 0.360f);
+//    std::uniform_int_distribution<int> uniform_dist_int(0, 5);
+//
+//    TableBuilder colBuilder;
+//    auto rowWriterCol = colBuilder.cursor<o2::aod::Collisions>();
+//    for (auto i = 0; i < state.range(0); ++i) {
+//      float x = uniform_dist_x(e1);
+//      float y = uniform_dist_y(e1);
+//      rowWriterCol(0, uniform_dist_int(e1),
+//                   x, y, uniform_dist(e1),
+//                   uniform_dist(e1), uniform_dist(e1), uniform_dist(e1),
+//                   uniform_dist(e1), uniform_dist(e1), uniform_dist(e1),
+//                   uniform_dist_int(e1), uniform_dist(e1),
+//                   uniform_dist_int(e1),
+//                   uniform_dist(e1), uniform_dist(e1));
+//    }
+//    auto tableCol = colBuilder.finalize();
+//    o2::aod::Collisions collisions{tableCol};
+//  }
+//  state.SetBytesProcessed(state.iterations() * (12 * sizeof(float) + sizeof(int64_t) + 3 * sizeof(int)) * state.range(0));
+//}
+//
+//BENCHMARK(BM_EventMixingTableCreation)->RangeMultiplier(2)->Range(4, 2 << maxColPairsRange);
+//
+//static void BM_EventMixingBinningCreation(benchmark::State& state)
+//{
+//  std::vector<double> xBins{VARIABLE_WIDTH, -0.064, -0.062, -0.060, 0.066, 0.068, 0.070, 0.072};
+//  std::vector<double> yBins{VARIABLE_WIDTH, -0.320, -0.301, -0.300, 0.330, 0.340, 0.350, 0.360};
+//
+//  for (auto _ : state) {
+//    using BinningType = ColumnBinningPolicy<o2::aod::collision::PosX, o2::aod::collision::PosY>;
+//    BinningType binningOnPositions{{xBins, yBins}, true}; // true is for 'ignore overflows' (true by default)
+//  }
+//  state.SetBytesProcessed(state.iterations() * sizeof(float));
+//}
+//
+//BENCHMARK(BM_EventMixingBinningCreation)->RangeMultiplier(2)->Range(4, 2 << maxColPairsRange);
 
 static void BM_EventMixingPolicyCreation(benchmark::State& state)
 {
@@ -115,7 +115,8 @@ static void BM_EventMixingPolicyCreation(benchmark::State& state)
   state.SetBytesProcessed(state.iterations() * sizeof(float) * state.range(0));
 }
 
-BENCHMARK(BM_EventMixingPolicyCreation)->RangeMultiplier(2)->Range(4, 2 << maxColPairsRange);
+BENCHMARK(BM_EventMixingPolicyCreation)->RangeMultiplier(2)->Range(2 << 19, 2 << maxColPairsRange);
+//BENCHMARK(BM_EventMixingPolicyCreation)->DenseRange(2<<20, 2<<21, 50)
 
 static void BM_EventMixingCombinationsCreation(benchmark::State& state)
 {
@@ -155,7 +156,8 @@ static void BM_EventMixingCombinationsCreation(benchmark::State& state)
   state.SetBytesProcessed(state.iterations() * sizeof(float));
 }
 
-BENCHMARK(BM_EventMixingCombinationsCreation)->RangeMultiplier(2)->Range(4, 2 << maxColPairsRange);
+BENCHMARK(BM_EventMixingCombinationsCreation)->RangeMultiplier(2)->Range(2 << 19, 2 << maxColPairsRange);
+//BENCHMARK(BM_EventMixingCombinationsCreation)->DenseRange(2<<18, 2<<19, 10486);
 
 static void BM_EventMixingCombinations(benchmark::State& state)
 {
@@ -204,6 +206,7 @@ static void BM_EventMixingCombinations(benchmark::State& state)
   state.SetBytesProcessed(state.iterations() * sizeof(float) * colCount);
 }
 
-BENCHMARK(BM_EventMixingCombinations)->RangeMultiplier(2)->Range(4, 2 << maxColPairsRange);
+BENCHMARK(BM_EventMixingCombinations)->RangeMultiplier(2)->Range(2 << 19, 2 << maxColPairsRange);
+//BENCHMARK(BM_EventMixingCombinations)->DenseRange(2<<20, 2<<21, 50)
 
 BENCHMARK_MAIN();
