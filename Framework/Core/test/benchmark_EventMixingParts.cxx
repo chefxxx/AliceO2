@@ -25,9 +25,9 @@ using namespace o2::soa;
 // Validation of new event mixing: time complexity same as for naive loop
 
 #ifdef __APPLE__
-constexpr unsigned int maxColPairsRange = 29;
+constexpr unsigned int maxColPairsRange = 30;
 #else
-constexpr unsigned int maxColPairsRange = 29;
+constexpr unsigned int maxColPairsRange = 30;
 #endif
 constexpr int numEventsToMix = 5;
 
@@ -115,7 +115,7 @@ static void BM_EventMixingPolicyCreation(benchmark::State& state)
   state.SetBytesProcessed(state.iterations() * sizeof(float) * state.range(0));
 }
 
-BENCHMARK(BM_EventMixingPolicyCreation)->RangeMultiplier(2)->Range(2 << 20, 2 << maxColPairsRange);
+BENCHMARK(BM_EventMixingPolicyCreation)->RangeMultiplier(2)->Range(2 << 20, 2UL << maxColPairsRange);
 //BENCHMARK(BM_EventMixingPolicyCreation)->DenseRange(2<<20, 2<<21, 50)
 
 static void BM_EventMixingCombinationsCreation(benchmark::State& state)
@@ -156,7 +156,7 @@ static void BM_EventMixingCombinationsCreation(benchmark::State& state)
   state.SetBytesProcessed(state.iterations() * sizeof(float));
 }
 
-BENCHMARK(BM_EventMixingCombinationsCreation)->RangeMultiplier(2)->Range(2 << 20, 2 << maxColPairsRange);
+BENCHMARK(BM_EventMixingCombinationsCreation)->RangeMultiplier(2)->Range(2 << 20, 2UL << maxColPairsRange);
 //BENCHMARK(BM_EventMixingCombinationsCreation)->DenseRange(2<<18, 2<<19, 10486);
 
 static void BM_EventMixingCombinations(benchmark::State& state)
@@ -206,7 +206,7 @@ static void BM_EventMixingCombinations(benchmark::State& state)
   state.SetBytesProcessed(state.iterations() * sizeof(float) * colCount);
 }
 
-BENCHMARK(BM_EventMixingCombinations)->RangeMultiplier(2)->Range(2 << 20, 2 << maxColPairsRange);
+BENCHMARK(BM_EventMixingCombinations)->RangeMultiplier(2)->Range(2 << 20, 2UL << maxColPairsRange);
 //BENCHMARK(BM_EventMixingCombinations)->DenseRange(2<<20, 2<<21, 50)
 
 BENCHMARK_MAIN();
