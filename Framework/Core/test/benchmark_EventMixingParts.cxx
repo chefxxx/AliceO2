@@ -25,9 +25,9 @@ using namespace o2::soa;
 // Validation of new event mixing: time complexity same as for naive loop
 
 #ifdef __APPLE__
-constexpr unsigned int maxColPairsRange = 31;
+constexpr unsigned int maxColPairsRange = 20;
 #else
-constexpr unsigned int maxColPairsRange = 29;
+constexpr unsigned int maxColPairsRange = 20;
 #endif
 constexpr int numEventsToMix = 5;
 
@@ -115,7 +115,7 @@ static void BM_EventMixingPolicyCreation(benchmark::State& state)
   state.SetBytesProcessed(state.iterations() * sizeof(float) * state.range(0));
 }
 
-BENCHMARK(BM_EventMixingPolicyCreation)->RangeMultiplier(2)->Range(2 << maxColPairsRange, 2UL << maxColPairsRange);
+BENCHMARK(BM_EventMixingPolicyCreation)->RangeMultiplier(2)->Range(2UL << maxColPairsRange, 2UL << maxColPairsRange);
 //BENCHMARK(BM_EventMixingPolicyCreation)->DenseRange(2<<20, 2<<21, 50)
 
 //static void BM_EventMixingCombinationsCreation(benchmark::State& state)
