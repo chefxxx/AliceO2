@@ -22,7 +22,8 @@
 using namespace o2::framework;
 using namespace o2::soa;
 
-constexpr uint64_t testSize = 4194304;
+constexpr uint64_t testSize = 2UL<<15; // old: 4194304 = 2UL<<22;
+constexpr uint64_t testRep = 2UL<<10;
 constexpr int numEventsToMix = 5;
 
 TEST_CASE("EventMixingNaiveCollisionsPairsSameCategories")
@@ -120,4 +121,39 @@ TEST_CASE("EventMixingCombGenCollisionsPairsSameCategories")
     int bin = binningOnPositions.getBin({c1.posX(), c1.posY()});
   }
   std::cout << "End EventMixingCombGenCollisionsPairsSameCategories" << std::endl;
+}
+
+TEST_CASE("EventMixingPolicyCreation")
+{
+  // Seed with a real random value, if available
+  std::default_random_engine e1(1234567891);
+  std::uniform_real_distribution<float> uniform_dist(0.f, 1.f);
+  std::uniform_real_distribution<float> uniform_dist_x(-0.065f, 0.073f);
+  std::uniform_real_distribution<float> uniform_dist_y(-0.320f, 0.360f);
+  std::uniform_int_distribution<int> uniform_dist_int(0, 5);
+
+  TableBuilder colBuilder;
+  auto rowWriterCol = colBuilder.cursor<o2::aod::Collisions>();
+  for (auto i = 0; i < testSize; ++i) {
+    float x = uniform_dist_x(e1);
+    float y = uniform_dist_y(e1);
+    rowWriterCol(0, uniform_dist_int(e1),
+                 x, y, uniform_dist(e1),
+                 uniform_dist(e1), uniform_dist(e1), uniform_dist(e1),
+                 uniform_dist(e1), uniform_dist(e1), uniform_dist(e1),
+                 uniform_dist_int(e1), uniform_dist(e1),
+                 uniform_dist_int(e1),
+                 uniform_dist(e1), uniform_dist(e1));
+  }
+  auto tableCol = colBuilder.finalize();
+  o2::aod::Collisions collisions{tableCol};
+
+  std::vector<double> xBins{VARIABLE_WIDTH, -0.064, -0.062, -0.060, 0.066, 0.068, 0.070, 0.072};
+  std::vector<double> yBins{VARIABLE_WIDTH, -0.320, -0.301, -0.300, 0.330, 0.340, 0.350, 0.360};
+  using BinningType = ColumnBinningPolicy<o2::aod::collision::PosX, o2::aod::collision::PosY>;
+  BinningType binningOnPositions{{xBins, yBins}, true}; // true is for 'ignore overflows' (true by default)
+
+  for (auto i = 0; i < testRep; i++) {
+    auto combPolicy = CombinationsBlockStrictlyUpperSameIndexPolicy(binningOnPositions, numEventsToMix - 1, -1, collisions, collisions);
+  }
 }
