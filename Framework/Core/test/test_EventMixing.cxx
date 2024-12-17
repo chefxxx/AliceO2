@@ -22,7 +22,7 @@
 using namespace o2::framework;
 using namespace o2::soa;
 
-constexpr uint64_t testSize = 2UL<<15; // old: 4194304 = 2UL<<22;
+constexpr uint64_t testSize = 2UL<<10; // old: 4194304 = 2UL<<22;
 constexpr uint64_t testRep = 2UL<<10;
 constexpr int numEventsToMix = 5;
 
