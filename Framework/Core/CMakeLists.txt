@@ -219,6 +219,7 @@ add_executable(o2-test-framework-core
               test/test_DeviceStateHelpers.cxx
               test/test_Expressions.cxx
               test/test_ExternalFairMQDeviceProxy.cxx
+              test/test_EventMixing.cxx
               test/test_FairMQOptionsRetriever.cxx
               test/test_FairMQResizableBuffer.cxx
               test/test_FairMQ.cxx
@@ -341,6 +342,7 @@ foreach(b
         ASoA
         ASoAHelpers
         EventMixing
+        EventMixingParts
         HistogramRegistry
         TableToTree
         ExternalFairMQDeviceProxies
