@@ -13,9 +13,11 @@
 #define O2_FRAMEWORK_STRINGHELPERS_H_
 
 #include <cstdint>
+#include <ranges>
 #include <utility>
 #include <type_traits>
 #include <string_view>
+#include <vector>
 
 // CRC32 Table (zlib polynomial) static
 constexpr uint32_t crc_table[256] = {0x0L, 0x77073096L, 0xee0e612cL,
@@ -68,6 +70,17 @@ consteval uint32_t crc32(char const* str, int length)
   uint32_t crc = 0xFFFFFFFF;
   for (auto j = 0; j <= length; ++j) {
     crc = (crc >> 8) ^ crc_table[(crc ^ static_cast<unsigned int>(str[j])) & 0x000000FF];
+  }
+  return crc;
+}
+
+template <typename... Ts>
+  requires(std::same_as<Ts, std::string_view> && ...)
+consteval uint32_t crc32(Ts... Vs)
+{
+  uint32_t crc = 0xFFFFFFFF;
+  for (auto& c : std::vector{Vs...} | std::ranges::views::join) {
+    crc = (crc >> 8) ^ crc_table[(crc ^ static_cast<unsigned int>(c)) & 0x000000FF];
   }
   return crc;
 }

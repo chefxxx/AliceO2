@@ -1790,7 +1790,7 @@ void Geometry::SetMisalMatrixFromCcdb(const char* path, int timestamp) const
 {
   LOG(info) << "Using CCDB to obtain EMCal alignment.";
   o2::ccdb::CcdbApi api;
-  map<string, string> metadata; // can be empty
+  std::map<std::string, std::string> metadata; // can be empty
   api.init("http://alice-ccdb.cern.ch");
   TObjArray* matrices = api.retrieveFromTFileAny<TObjArray>(path, metadata, timestamp);
 

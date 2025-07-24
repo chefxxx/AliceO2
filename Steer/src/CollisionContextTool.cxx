@@ -594,7 +594,7 @@ int main(int argc, char* argv[])
         std::stringstream str;
         str << path_prefix << tf_output_counter++ << "/collisioncontext.root";
         copy.saveToFile(str.str());
-        LOG(info) << "----";
+        LOG(info) << "---- CollisionContext for timeframe " << tf_id << " -----";
         copy.printCollisionSummary();
       }
     }

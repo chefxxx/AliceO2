@@ -73,15 +73,16 @@ struct TimeFrame {
   gsl::span<const Vertex> getPrimaryVertices(int rofId) const;
   gsl::span<const Vertex> getPrimaryVertices(int romin, int romax) const;
   gsl::span<const std::pair<MCCompLabel, float>> getPrimaryVerticesMCRecInfo(const int rofId) const;
+  gsl::span<const MCCompLabel> getPrimaryVerticesContributors(const int rofId) const;
   gsl::span<const std::array<float, 2>> getPrimaryVerticesXAlpha(int rofId) const;
   void fillPrimaryVerticesXandAlpha();
   int getPrimaryVerticesNum(int rofId = -1) const;
-  void addPrimaryVertices(const bounded_vector<Vertex>& vertices);
   void addPrimaryVerticesLabels(bounded_vector<std::pair<MCCompLabel, float>>& labels);
-  void addPrimaryVertices(const bounded_vector<Vertex>& vertices, const int rofId, const int iteration);
-  void addPrimaryVertices(const gsl::span<const Vertex>& vertices, const int rofId, const int iteration);
+  void addPrimaryVerticesContributorLabels(bounded_vector<MCCompLabel>& labels);
+  void addPrimaryVertices(const bounded_vector<Vertex>& vertices, const int iteration);
   void addPrimaryVerticesInROF(const bounded_vector<Vertex>& vertices, const int rofId, const int iteration);
   void addPrimaryVerticesLabelsInROF(const bounded_vector<std::pair<MCCompLabel, float>>& labels, const int rofId);
+  void addPrimaryVerticesContributorLabelsInROF(const bounded_vector<MCCompLabel>& labels, const int rofId);
   void removePrimaryVerticesInROf(const int rofId);
   int loadROFrameData(const o2::itsmft::ROFRecord& rof, gsl::span<const itsmft::Cluster> clusters,
                       const dataformats::MCTruthContainer<MCCompLabel>* mcLabels = nullptr);
@@ -307,7 +308,7 @@ struct TimeFrame {
 
   const o2::base::PropagatorImpl<float>* mPropagatorDevice = nullptr; // Needed only for GPU
 
-  void wipe();
+  virtual void wipe();
 
  private:
   void prepareClusters(const TrackingParameters& trkParam, const int maxLayers = nLayers);
@@ -342,6 +343,7 @@ struct TimeFrame {
   std::array<bounded_vector<int>, 2> mTrackletsIndexROF;
   std::vector<bounded_vector<MCCompLabel>> mLinesLabels;
   std::vector<std::pair<MCCompLabel, float>> mVerticesMCRecInfo;
+  bounded_vector<MCCompLabel> mVerticesContributorLabels;
   std::array<uint32_t, 2> mTotalTracklets = {0, 0};
   unsigned int mNoVertexROF = 0;
   bounded_vector<int> mTotVertPerIteration;
@@ -372,12 +374,29 @@ inline gsl::span<const std::pair<MCCompLabel, float>> TimeFrame<nLayers>::getPri
 }
 
 template <int nLayers>
+inline gsl::span<const MCCompLabel> TimeFrame<nLayers>::getPrimaryVerticesContributors(const int rofId) const
+{
+  // count the number of cont. in rofs before target rof
+  unsigned int start{0}, delta{0};
+  const auto& pvsBefore = getPrimaryVertices(0, rofId - 1);
+  for (const auto& pv : pvsBefore) {
+    start += pv.getNContributors();
+  }
+  const auto& pvsIn = getPrimaryVertices(rofId);
+  for (const auto& pv : pvsIn) {
+    delta += pv.getNContributors();
+  }
+  return {&(mVerticesContributorLabels[start]), static_cast<gsl::span<const MCCompLabel>::size_type>(delta)};
+}
+
+template <int nLayers>
 inline gsl::span<const Vertex> TimeFrame<nLayers>::getPrimaryVertices(int romin, int romax) const
 {
   if (mPrimaryVertices.empty()) {
     return {};
   }
-  return {&mPrimaryVertices[mROFramesPV[romin]], static_cast<gsl::span<const Vertex>::size_type>(mROFramesPV[romax + 1] - mROFramesPV[romin])};
+  const int stop_idx = romax >= mNrof - 1 ? mNrof : romax + 1;
+  return {&mPrimaryVertices[mROFramesPV[romin]], static_cast<gsl::span<const Vertex>::size_type>(mROFramesPV[stop_idx] - mROFramesPV[romin])};
 }
 
 template <int nLayers>
@@ -512,8 +531,8 @@ inline gsl::span<int> TimeFrame<nLayers>::getIndexTable(int rofId, int layer)
   if (rofId < 0 || rofId >= mNrof) {
     return {};
   }
-  return {&mIndexTables[layer][rofId * (mIndexTableUtils.getNphiBins() * mIndexTableUtils.getNzBins() + 1)],
-          static_cast<gsl::span<int>::size_type>(mIndexTableUtils.getNphiBins() * mIndexTableUtils.getNzBins() + 1)};
+  const int tableSize = mIndexTableUtils.getNphiBins() * mIndexTableUtils.getNzBins() + 1;
+  return {&mIndexTables[layer][rofId * tableSize], static_cast<gsl::span<int>::size_type>(tableSize)};
 }
 
 template <int nLayers>
@@ -574,7 +593,7 @@ inline gsl::span<int> TimeFrame<nLayers>::getExclusiveNTrackletsCluster(int rofI
 template <int nLayers>
 inline gsl::span<Tracklet> TimeFrame<nLayers>::getFoundTracklets(int rofId, int combId)
 {
-  if (rofId < 0 || rofId >= mNrof) {
+  if (rofId < 0 || rofId >= mNrof || mTracklets[combId].empty()) {
     return {};
   }
   auto startIdx{mNTrackletsPerROF[combId][rofId]};

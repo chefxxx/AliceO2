@@ -23,13 +23,6 @@
 namespace o2::its::gpu
 {
 
-class Stream;
-
-class DefaultGPUAllocator : public ExternalAllocator
-{
-  void* allocate(size_t size) override;
-};
-
 template <int nLayers = 7>
 class TimeFrameGPU : public TimeFrame<nLayers>
 {
@@ -81,11 +74,12 @@ class TimeFrameGPU : public TimeFrame<nLayers>
   void downloadCellsLUTDevice();
   void unregisterRest();
   template <Task task>
-  Stream& getStream(const size_t stream)
+  auto& getStream(const size_t stream)
   {
-    return *mGpuStreams[stream];
+    return mGpuStreams[stream];
   }
-  void wipe(const int);
+  auto& getStreams() { return mGpuStreams; }
+  virtual void wipe() final;
 
   /// interface
   int getNClustersInRofSpan(const int, const int, const int) const;
@@ -146,7 +140,7 @@ class TimeFrameGPU : public TimeFrame<nLayers>
   int getNumberOfNeighbours() const final;
 
  private:
-  void allocMemAsync(void**, size_t, Stream*, bool); // Abstract owned and unowned memory allocations
+  void allocMemAsync(void**, size_t, Stream&, bool); // Abstract owned and unowned memory allocations
   bool mHostRegistered = false;
   TimeFrameGPUParameters mGpuParams;
 
@@ -200,7 +194,7 @@ class TimeFrameGPU : public TimeFrame<nLayers>
   const TrackingFrameInfo** mTrackingFrameInfoDeviceArray;
 
   // State
-  std::vector<Stream*> mGpuStreams;
+  Streams mGpuStreams;
   size_t mAvailMemGB;
   bool mFirstInit = true;
 

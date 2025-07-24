@@ -32,7 +32,7 @@ endif()
 
 if(Vulkan_FOUND)
   string(FIND "${Vulkan_VERSION}" "." vulkan_dot_index)
-  if(NOT ${Vulkan_VERSION} VERSION_GREATER_EQUAL "1.3.0" OR dot_index EQUAL -1 OR Vulkan_GLSLC_EXECUTABLE STREQUAL "Vulkan_GLSLC_EXECUTABLE-NOTFOUND")
+  if(NOT ${Vulkan_VERSION} VERSION_GREATER_EQUAL "1.3.0" OR vulkan_dot_index EQUAL -1 OR Vulkan_GLSLC_EXECUTABLE STREQUAL "Vulkan_GLSLC_EXECUTABLE-NOTFOUND")
     set(Vulkan_FOUND 0)
   endif()
 endif()

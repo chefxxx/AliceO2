@@ -49,6 +49,8 @@ class GPUTPCNNClusterizerHost
 
   void init(const GPUSettingsProcessingNNclusterizer&);
   void initClusterizer(const GPUSettingsProcessingNNclusterizer&, GPUTPCNNClusterizer&);
+  void createBoundary(GPUTPCNNClusterizer&);
+  void createIndexLookup(GPUTPCNNClusterizer&);
 
   // ONNX
   void directOrtAllocator(Ort::Env*, Ort::MemoryInfo*, GPUReconstruction*, bool = false);

@@ -147,8 +147,7 @@ namespace apts
 {
 constexpr double pitchX{15.0 * mu};
 constexpr double pitchZ{15.0 * mu};
-constexpr double responseUpperLimit{10 * mu};
-constexpr double responseYShift{responseUpperLimit - silicon::thicknessOut};
+constexpr double responseYShift{15.5 * mu};
 } // namespace apts
 namespace moss
 {

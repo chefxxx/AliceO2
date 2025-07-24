@@ -1,4 +1,4 @@
-// Copyright 2019-2020 CERN and copyright holders of ALICE O2.
+// Copyright 2019-2025 CERN and copyright holders of ALICE O2.
 // See https://alice-o2.web.cern.ch/copyright for details of the copyright holders.
 // All rights not expressly granted are reserved.
 //
@@ -9,24 +9,15 @@
 // granted to it by virtue of its status as an Intergovernmental Organization
 // or submit itself to any jurisdiction.
 
-/// \file GPUITSTrack.h
-/// \author David Rohr, Maximiliano Puccio
+#ifndef O2_FRAMEWORK_TOPOLOGYPOLICYHELPERS_H_
+#define O2_FRAMEWORK_TOPOLOGYPOLICYHELPERS_H_
+#include "Framework/WorkflowSpec.h"
+#include <vector>
 
-#ifndef GPUITSTRACK_H
-#define GPUITSTRACK_H
-
-#include "GPUTPCGMMergerTypes.h"
-#include "GPUTPCGMTrackParam.h"
-
-namespace o2::gpu
+namespace o2::framework
 {
-class GPUITSTrack : public GPUTPCGMTrackParam
-{
- public:
-  gputpcgmmergertypes::GPUTPCOuterParam mOuterParam;
-  float mAlpha;
-  int32_t mClusters[7];
+struct TopologyPolicyHelpers {
+  static auto buildEdges(WorkflowSpec& physicalWorkflow) -> std::vector<std::pair<int, int>>;
 };
-} // namespace o2::gpu
-
-#endif
+} // namespace o2::framework
+#endif // O2_FRAMEWORK_TOPOLOGYPOLICYHELPERS_H_

@@ -43,7 +43,7 @@ WorkflowSpec defineDataProcessing(ConfigContext const& configcontext)
   bool writeUnbinnedResiduals = false;
   bool writeBinnedResiduals = false;
   bool writeTrackData = false;
-  auto outputType = configcontext.options().get<string>("output-type");
+  auto outputType = configcontext.options().get<std::string>("output-type");
   std::vector<std::string> outputTypes;
   size_t pos = 0;
   while ((pos = outputType.find(",")) != std::string::npos) {

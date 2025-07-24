@@ -273,8 +273,8 @@ bool GPUChainTracking::ValidateSettings()
     GPUError("NStreams of %d insufficient for %d nTPCClustererLanes", mRec->NStreams(), (int32_t)GetProcessingSettings().nTPCClustererLanes);
     return false;
   }
-  if (GetProcessingSettings().noGPUMemoryRegistration && gatherMode != 3) {
-    GPUError("noGPUMemoryRegistration only possible with gather mode 3");
+  if ((mRec->GetRecoStepsGPU() & GPUDataTypes::RecoStep::TPCCompression) && GetProcessingSettings().noGPUMemoryRegistration && gatherMode != 3) {
+    GPUError("noGPUMemoryRegistration only possible with gather mode 3 (set to %d / %d)", mRec->GetProcessingSettings().tpcCompressionGatherMode, gatherMode);
     return false;
   }
   if (GetProcessingSettings().doublePipeline) {

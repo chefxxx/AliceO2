@@ -9,16 +9,13 @@
 # granted to it by virtue of its status as an Intergovernmental Organization
 # or submit itself to any jurisdiction.
 
-#add_compile_options(-O0 -g -fPIC -fno-omit-frame-pointer)
 o2_add_library(ITStracking
                TARGETVARNAME targetName
                SOURCES src/ClusterLines.cxx
                        src/Cluster.cxx
                        src/Configuration.cxx
-                       src/ROframe.cxx
                        src/TimeFrame.cxx
                        src/IOUtils.cxx
-                       src/Label.cxx
                        src/Tracker.cxx
                        src/TrackerTraits.cxx
                        src/TrackingConfigParam.cxx
@@ -36,7 +33,10 @@ o2_add_library(ITStracking
                        O2::ITSReconstruction
                        O2::ITSMFTReconstruction
                        O2::DataFormatsITS
-               PRIVATE_LINK_LIBRARIES TBB::tbb)
+               PRIVATE_LINK_LIBRARIES
+                       O2::Steer
+                       TBB::tbb)
+# target_compile_options(${targetName} PRIVATE -O0 -g -fPIC -fno-omit-frame-pointer)
 
 o2_add_library(ITSTrackingInterface
                TARGETVARNAME targetName

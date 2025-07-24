@@ -556,7 +556,7 @@ class CcdbApi //: public DatabaseInterface
    * @param tcl The TClass object describing the serialized type
    * @return raw pointer to created object
    */
-  void* downloadFilesystemContent(std::string const& fullUrl, std::type_info const& tinfo, std::map<string, string>* headers) const;
+  void* downloadFilesystemContent(std::string const& fullUrl, std::type_info const& tinfo, std::map<std::string, std::string>* headers) const;
 
   // initialize the TGrid (Alien connection)
   bool initTGrid() const;

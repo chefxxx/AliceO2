@@ -20,6 +20,7 @@
 #include "SimulationDataFormat/MCCompLabel.h"
 #include "SimulationDataFormat/MCTruthContainer.h"
 #include "ReconstructionDataFormats/Vertex.h"
+#include "ITStracking/TrackingConfigParam.h"
 
 using namespace o2::framework;
 
@@ -39,6 +40,7 @@ DataProcessorSpec getTrackWriterSpec(bool useMC)
 {
   // Spectators for logging
   // this is only to restore the original behavior
+  const auto writeContLabels = VertexerParamConfig::Instance().outputContLabels && useMC;
   auto tracksSize = std::make_shared<int>(0);
   auto tracksSizeGetter = [tracksSize](std::vector<o2::its::TrackITS> const& tracks) {
     *tracksSize = tracks.size();
@@ -68,6 +70,11 @@ DataProcessorSpec getTrackWriterSpec(bool useMC)
                                 BranchDefinition<LabelsType>{InputSpec{"labelsVertices", "ITS", "VERTICESMCTR", 0},
                                                              "ITSVertexMCTruth",
                                                              (useMC ? 1 : 0), // one branch if mc labels enabled
+                                                             ""},
+                                BranchDefinition<LabelsType>{InputSpec{"labelsVerticesContributors", "ITS", "VERTICESMCTRCONT", 0},
+                                                             "ITSVertexMCTruthCont",
+                                                             (writeContLabels ? 1 : 0), // one branch if
+                                                                                        // requested
                                                              ""},
                                 BranchDefinition<ROFRecLblT>{InputSpec{"MC2ROframes", "ITS", "ITSTrackMC2ROF", 0},
                                                              "ITSTracksMC2ROF",

@@ -705,7 +705,7 @@ DigitizationContext DigitizationContext::extractSingleTimeframe(int timeframeid,
     }
     std::copy(mEventRecords.begin() + startindex, mEventRecords.begin() + endindex, std::back_inserter(r.mEventRecords));
     std::copy(mEventParts.begin() + startindex, mEventParts.begin() + endindex, std::back_inserter(r.mEventParts));
-    if (mInteractionVertices.size() > endindex) {
+    if (mInteractionVertices.size() >= endindex) {
       std::copy(mInteractionVertices.begin() + startindex, mInteractionVertices.begin() + endindex, std::back_inserter(r.mInteractionVertices));
     }
 

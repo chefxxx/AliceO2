@@ -340,8 +340,9 @@ concept is_spawns = requires(T t) {
 /// The actual expressions have to be set in init() for the configurable expression
 /// columns, used to define the table
 
-template <is_dynamically_spawnable T>
+template <is_dynamically_spawnable T, bool DELAYED = false>
 struct Defines : decltype(transformBase<T>()) {
+  static constexpr bool delayed = DELAYED;
   using spawnable_t = T;
   using metadata = decltype(transformBase<T>())::metadata;
   using extension_t = typename metadata::extension_table_t;
@@ -373,13 +374,26 @@ struct Defines : decltype(transformBase<T>()) {
   std::array<o2::framework::expressions::Projector, N> projectors;
   std::shared_ptr<gandiva::Projector> projector = nullptr;
   std::shared_ptr<arrow::Schema> schema = std::make_shared<arrow::Schema>(o2::soa::createFieldsFromColumns(placeholders_pack_t{}));
+  std::shared_ptr<arrow::Schema> inputSchema = nullptr;
+
+  bool needRecompilation = false;
+
+  void recompile()
+  {
+    projector = framework::expressions::createProjectorHelper(N, projectors.data(), inputSchema, schema->fields());
+  }
 };
+
+template <is_dynamically_spawnable T>
+using DefinesDelayed = Defines<T, true>;
 
 template <typename T>
 concept is_defines = requires(T t) {
   typename T::metadata;
   requires std::same_as<decltype(t.pack()), typename T::placeholders_pack_t>;
   requires std::same_as<decltype(t.projector), std::shared_ptr<gandiva::Projector>>;
+  requires std::same_as<decltype(t.needRecompilation), bool>;
+  &T::recompile;
 };
 
 /// Policy to control index building

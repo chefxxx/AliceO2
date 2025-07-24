@@ -15,12 +15,8 @@
 
 #ifndef TRACKINGITSU_INCLUDE_CACELL_H_
 #define TRACKINGITSU_INCLUDE_CACELL_H_
-#ifndef GPUCA_GPUCODE_DEVICE
-#include <array>
-#include <vector>
-#include <iostream>
-#endif
 
+#include "ITStracking/Constants.h"
 #include "GPUCommonDef.h"
 
 namespace o2::its
@@ -29,22 +25,6 @@ namespace o2::its
 class Cell final
 {
  public:
-  GPUhdDefault() Cell() = default;
-  GPUhd() Cell(const int firstClusterIndex, const int secondClusterIndex, const int thirdClusterIndex,
-               const int firstTrackletIndex, const int secondTrackletIndex)
-    : mFirstClusterIndex(firstClusterIndex),
-      mSecondClusterIndex(secondClusterIndex),
-      mThirdClusterIndex(thirdClusterIndex),
-      mFirstTrackletIndex(firstTrackletIndex),
-      mSecondTrackletIndex(secondTrackletIndex),
-      mLevel(1) {}
-  GPUhdDefault() Cell(const Cell&) = default;
-  GPUhdDefault() Cell(Cell&&) = default;
-  GPUhdDefault() ~Cell() = default;
-
-  GPUhdDefault() Cell& operator=(const Cell&) = default;
-  GPUhdDefault() Cell& operator=(Cell&&) noexcept = default;
-
   GPUhd() int getFirstClusterIndex() const { return mFirstClusterIndex; };
   GPUhd() int getSecondClusterIndex() const { return mSecondClusterIndex; };
   GPUhd() int getThirdClusterIndex() const { return mThirdClusterIndex; };
@@ -55,12 +35,12 @@ class Cell final
   GPUhd() int* getLevelPtr() { return &mLevel; }
 
  private:
-  int mFirstClusterIndex{0};
-  int mSecondClusterIndex{0};
-  int mThirdClusterIndex{0};
-  int mFirstTrackletIndex{0};
-  int mSecondTrackletIndex{0};
-  int mLevel{0};
+  int mFirstClusterIndex{constants::UnusedIndex};
+  int mSecondClusterIndex{constants::UnusedIndex};
+  int mThirdClusterIndex{constants::UnusedIndex};
+  int mFirstTrackletIndex{constants::UnusedIndex};
+  int mSecondTrackletIndex{constants::UnusedIndex};
+  int mLevel{constants::UnusedIndex};
 };
 
 class CellSeed final : public o2::track::TrackParCovF
@@ -98,14 +78,14 @@ class CellSeed final : public o2::track::TrackParCovF
   GPUhd() int getCluster(int i) const { return mClusters[i]; }
   GPUhd() void printCell() const
   {
-    printf("trkl: %d, %d\t lvl: %d\t chi2: %f\n", mTracklets[0], mTracklets[1], mLevel, mChi2);
+    printf("trkl: %d, %d\t lvl: %d\t chi2: %f\tcls: [%d | %d | %d | %d | %d | %d | %d]\n", mTracklets[0], mTracklets[1], mLevel, mChi2, mClusters[0], mClusters[1], mClusters[2], mClusters[3], mClusters[4], mClusters[5], mClusters[6]);
   }
 
  private:
-  float mChi2 = 0.f;
-  int mLevel = 0;
-  int mTracklets[2] = {-1, -1};
-  int mClusters[7] = {-1, -1, -1, -1, -1, -1, -1};
+  float mChi2 = -999.f;
+  int mLevel = constants::UnusedIndex;
+  int mTracklets[2] = {constants::UnusedIndex, constants::UnusedIndex};
+  int mClusters[7] = {constants::UnusedIndex, constants::UnusedIndex, constants::UnusedIndex, constants::UnusedIndex, constants::UnusedIndex, constants::UnusedIndex, constants::UnusedIndex};
 };
 
 } // namespace o2::its

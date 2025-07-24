@@ -63,6 +63,13 @@ int32_t GPUReconstructionOCL::GPUChkErrInternal(const int64_t error, const char*
 
 int32_t GPUReconstructionOCL::InitDevice_Runtime()
 {
+  // Propagate processing settings to PoCL runtime.
+  // Won't affect other OpenCL runtimes.
+  if (int nThreads = mProcessingSettings->nHostThreads; nThreads > 0) {
+    auto nThreadsStr = std::to_string(nThreads);
+    setenv("POCL_CPU_MAX_CU_COUNT", nThreadsStr.c_str(), 1);
+  }
+
   if (mMaster == nullptr) {
     cl_int ocl_error;
     cl_uint num_platforms;

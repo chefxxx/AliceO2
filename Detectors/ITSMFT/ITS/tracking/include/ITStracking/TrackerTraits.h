@@ -65,7 +65,6 @@ class TrackerTraits
 
   virtual void setBz(float bz);
   float getBz() const { return mBz; }
-  void setCorrType(const o2::base::PropagatorImpl<float>::MatCorrType type) { mCorrType = type; }
   bool isMatLUT() const;
   virtual const char* getName() const noexcept { return "CPU"; }
   virtual bool isGPU() const noexcept { return false; }
@@ -99,7 +98,6 @@ class TrackerTraits
   std::shared_ptr<tbb::task_arena> mTaskArena;
 
  protected:
-  o2::base::PropagatorImpl<float>::MatCorrType mCorrType = o2::base::PropagatorImpl<float>::MatCorrType::USEMatCorrNONE;
   o2::gpu::GPUChainITS* mChain = nullptr;
   TimeFrame<nLayers>* mTimeFrame;
   std::vector<TrackingParameters> mTrkParams;

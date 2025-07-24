@@ -174,6 +174,14 @@ void clearResizeBoundedArray(std::array<bounded_vector<T>, S>& arr, size_t size,
   }
 }
 
+template <typename T>
+std::vector<T> toSTDVector(const bounded_vector<T>& b)
+{
+  std::vector<T> t(b.size());
+  std::copy(b.cbegin(), b.cend(), t.begin());
+  return t;
+}
+
 } // namespace o2::its
 
 #endif

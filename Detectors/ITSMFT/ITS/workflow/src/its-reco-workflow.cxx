@@ -11,7 +11,6 @@
 
 #include "ITSWorkflow/RecoWorkflow.h"
 #include "CommonUtils/ConfigurableParam.h"
-#include "ITStracking/TrackingConfigParam.h"
 #include "ITStracking/Configuration.h"
 #include "DetectorsRaw/HBFUtilsInitializer.h"
 #include "Framework/CallbacksPolicy.h"
@@ -45,7 +44,7 @@ void customize(std::vector<o2::framework::ConfigParamSpec>& workflowOptions)
     {"trackerCA", o2::framework::VariantType::Bool, false, {"use trackerCA (default: trackerCM)"}},
     {"ccdb-meanvertex-seed", o2::framework::VariantType::Bool, false, {"use MeanVertex from CCDB if available to provide beam position seed (default: false)"}},
     {"select-with-triggers", o2::framework::VariantType::String, "none", {"use triggers to prescale processed ROFs: phys, trd, none"}},
-    {"tracking-mode", o2::framework::VariantType::String, "sync", {"sync,async,cosmics"}},
+    {"tracking-mode", o2::framework::VariantType::String, "sync", {"sync,async,cosmics,unset,off"}},
     {"disable-tracking", o2::framework::VariantType::Bool, false, {"disable tracking step"}},
     {"configKeyValues", VariantType::String, "", {"Semicolon separated key=value strings"}},
     {"use-full-geometry", o2::framework::VariantType::Bool, false, {"use full geometry instead of the light-weight ITS part"}},
@@ -75,9 +74,8 @@ WorkflowSpec defineDataProcessing(ConfigContext const& configcontext)
   auto disableRootOutput = configcontext.options().get<bool>("disable-root-output");
   auto useGeom = configcontext.options().get<bool>("use-full-geometry");
   if (configcontext.options().get<bool>("disable-tracking")) {
-    trmode = "";
+    trmode = "off";
   }
-  std::transform(trmode.begin(), trmode.end(), trmode.begin(), [](unsigned char c) { return std::tolower(c); });
 
   o2::conf::ConfigurableParam::updateFromString(configcontext.options().get<std::string>("configKeyValues"));
   int trType = 0;
@@ -92,7 +90,7 @@ WorkflowSpec defineDataProcessing(ConfigContext const& configcontext)
   }
   auto wf = o2::its::reco_workflow::getWorkflow(useMC,
                                                 useCAtracker,
-                                                trmode,
+                                                o2::its::TrackingMode::fromString(trmode),
                                                 beamPosOVerride,
                                                 extDigits,
                                                 extClusters,

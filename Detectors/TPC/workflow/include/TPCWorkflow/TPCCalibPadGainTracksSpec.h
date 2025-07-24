@@ -139,7 +139,7 @@ class TPCCalibPadGainTracksDevice : public o2::framework::Task
     if (matcher == ConcreteDataMatcher(gDataOriginTPC, "RESIDUALGAINMAP", 0)) {
       if (!mUsingDefaultGainMapForFirstIter) {
         LOGP(info, "Updating reference gain map from previous iteration from CCDB");
-        const auto* gainMapResidual = static_cast<std::unordered_map<string, o2::tpc::CalDet<float>>*>(obj);
+        const auto* gainMapResidual = static_cast<std::unordered_map<std::string, o2::tpc::CalDet<float>>*>(obj);
         mPadGainTracks.setRefGainMap(gainMapResidual->at("GainMap"));
       } else {
         // just skip for the first time asking for an object -> not gain map will be used as reference

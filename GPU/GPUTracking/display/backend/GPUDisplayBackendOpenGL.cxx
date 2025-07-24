@@ -330,9 +330,9 @@ int32_t GPUDisplayBackendOpenGL::InitBackendA()
 #if defined(GL_VERSION_4_6) && GL_VERSION_4_6 == 1 && defined(GPUCA_BUILD_EVENT_DISPLAY_VULKAN)
   if (getenv("USE_SPIRV_SHADERS") && atoi(getenv("USE_SPIRV_SHADERS"))) {
     CHKERR(glShaderBinary(1, &mVertexShader, GL_SHADER_BINARY_FORMAT_SPIR_V_ARB, _binary_shaders_shaders_vertex_vert_spv_start, _binary_shaders_shaders_vertex_vert_spv_len));
-    CHKERR(glSpecializeShader(mVertexShader, "main", 0, 0, 0));
+    CHKERR(glSpecializeShader(mVertexShader, "main", 0, nullptr, nullptr));
     CHKERR(glShaderBinary(1, &mFragmentShader, GL_SHADER_BINARY_FORMAT_SPIR_V_ARB, _binary_shaders_shaders_fragmentUniform_frag_spv_start, _binary_shaders_shaders_fragmentUniform_frag_spv_len));
-    CHKERR(glSpecializeShader(mFragmentShader, "main", 0, 0, 0));
+    CHKERR(glSpecializeShader(mFragmentShader, "main", 0, nullptr, nullptr));
     GPUInfo("Using SPIR-V shaders");
     mSPIRVShaders = true;
   } else

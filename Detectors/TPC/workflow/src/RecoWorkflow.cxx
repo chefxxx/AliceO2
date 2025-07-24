@@ -159,6 +159,8 @@ framework::WorkflowSpec getWorkflow(CompletionPolicyData* policyData, std::vecto
 
   WorkflowSpec specs;
 
+  bool produceTracks = isEnabled(OutputType::Tracks);
+
   // We provide a special publishing method for labels which have been stored in a split format and need
   // to be transformed into a contiguous shareable container before publishing. For other branches/types this returns
   // false and the generic RootTreeWriter publishing proceeds
@@ -196,7 +198,7 @@ framework::WorkflowSpec getWorkflow(CompletionPolicyData* policyData, std::vecto
       if (sclOpts.needTPCScalersWorkflow()) { // for standalone tpc-reco workflow
         specs.emplace_back(o2::tpc::getTPCScalerSpec(sclOpts.lumiType == 2, sclOpts.enableMShapeCorrection));
       }
-      if (sclOpts.requestCTPLumi) { // need CTP digits (lumi) reader
+      if (produceTracks && sclOpts.requestCTPLumi) { // need CTP digits (lumi) reader
         specs.emplace_back(o2::ctp::getDigitsReaderSpec(false));
       }
     } else if (inputType == InputType::ClustersHardware) {
@@ -247,7 +249,6 @@ framework::WorkflowSpec getWorkflow(CompletionPolicyData* policyData, std::vecto
   // Note: the ClusterHardware format is probably a deprecated legacy format and also the
   // ClusterDecoderRawSpec
   bool produceCompClusters = isEnabled(OutputType::CompClusters);
-  bool produceTracks = isEnabled(OutputType::Tracks);
   bool runGPUReco = (produceTracks || produceCompClusters || (isEnabled(OutputType::Clusters) && caClusterer) || inputType == InputType::CompClustersCTF) && inputType != InputType::CompClustersFlat;
   bool runHWDecoder = !caClusterer && (runGPUReco || isEnabled(OutputType::Clusters));
   bool runClusterer = !caClusterer && (runHWDecoder || isEnabled(OutputType::ClustersHardware));

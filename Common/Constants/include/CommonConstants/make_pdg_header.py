@@ -144,7 +144,7 @@ class Pdg(Enum):
     kHyperHelium4 = 1010020040
     kHyperHelium5 = 1010020050
     kHyperHelium4Sigma = 1110020040
-
+    kLambda1520_Py = 102134  # PYTHIA code different from PDG
 
 dbPdg = ROOT.o2.O2DatabasePDG
 

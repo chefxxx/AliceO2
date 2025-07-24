@@ -1674,11 +1674,11 @@ void AODProducerWorkflowDPL::init(InitContext& ic)
 {
   mTimer.Stop();
   o2::base::GRPGeomHelper::instance().setRequest(mGGCCDBRequest);
-  mLPMProdTag = ic.options().get<string>("lpmp-prod-tag");
-  mAnchorPass = ic.options().get<string>("anchor-pass");
-  mAnchorProd = ic.options().get<string>("anchor-prod");
-  mUser = ic.options().get<string>("created-by");
-  mRecoPass = ic.options().get<string>("reco-pass");
+  mLPMProdTag = ic.options().get<std::string>("lpmp-prod-tag");
+  mAnchorPass = ic.options().get<std::string>("anchor-pass");
+  mAnchorProd = ic.options().get<std::string>("anchor-prod");
+  mUser = ic.options().get<std::string>("created-by");
+  mRecoPass = ic.options().get<std::string>("reco-pass");
   mTFNumber = ic.options().get<int64_t>("aod-timeframe-id");
   mRecoOnly = ic.options().get<int>("reco-mctracks-only");
   mTruncate = ic.options().get<int>("enable-truncation");
@@ -2717,7 +2717,7 @@ AODProducerWorkflowDPL::TrackQA AODProducerWorkflowDPL::processBarrelTrackQA(int
     if (auto itsContGID = data.getITSContributorGID(trackIndex); itsContGID.isIndexSet() && itsContGID.getSource() != GIndex::ITSAB) {
       const auto& itsOrig = data.getITSTrack(itsContGID);
       o2::track::TrackPar gloCopy = trackPar;
-      o2::track::TrackPar itsCopy = itsOrig;
+      o2::track::TrackPar itsCopy = itsOrig.getParamOut();
       o2::track::TrackPar tpcCopy = tpcOrig;
       if (prop->propagateToX(gloCopy, o2::aod::track::trackQARefRadius, prop->getNominalBz(), o2::base::Propagator::MAX_SIN_PHI, o2::base::Propagator::MAX_STEP, mMatCorr) &&
           prop->propagateToAlphaX(tpcCopy, gloCopy.getAlpha(), o2::aod::track::trackQARefRadius, false, o2::base::Propagator::MAX_SIN_PHI, o2::base::Propagator::MAX_STEP, 1, mMatCorr) &&

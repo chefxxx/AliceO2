@@ -84,7 +84,8 @@ void countTrackletsInROFsHandler(const IndexTableUtils* utils,
                                  std::vector<float>& radii,
                                  bounded_vector<float>& mulScatAng,
                                  const int nBlocks,
-                                 const int nThreads);
+                                 const int nThreads,
+                                 gpu::Streams& streams);
 
 template <int nLayers = 7>
 void computeTrackletsInROFsHandler(const IndexTableUtils* utils,
@@ -117,7 +118,8 @@ void computeTrackletsInROFsHandler(const IndexTableUtils* utils,
                                    std::vector<float>& radii,
                                    bounded_vector<float>& mulScatAng,
                                    const int nBlocks,
-                                   const int nThreads);
+                                   const int nThreads,
+                                   gpu::Streams& streams);
 
 void countCellsHandler(const Cluster** sortedClusters,
                        const Cluster** unsortedClusters,

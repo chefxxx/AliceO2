@@ -44,22 +44,7 @@ GPUChainITS::~GPUChainITS()
   mITSVertexerTraits.reset();
 }
 
-GPUChainITS::GPUChainITS(GPUReconstruction* rec, uint32_t maxTracks) : GPUChain(rec), mMaxTracks(maxTracks) {}
-
-void GPUChainITS::RegisterPermanentMemoryAndProcessors() { mRec->RegisterGPUProcessor(&processors()->itsFitter, GetRecoStepsGPU() & RecoStep::ITSTracking); }
-
-void GPUChainITS::RegisterGPUProcessors()
-{
-  if (GetRecoStepsGPU() & RecoStep::ITSTracking) {
-    mRec->RegisterGPUDeviceProcessor(&processorsShadow()->itsFitter, &processors()->itsFitter);
-  }
-}
-
-void GPUChainITS::MemorySize(size_t& gpuMem, size_t& pageLockedHostMem)
-{
-  gpuMem = mMaxTracks * sizeof(GPUITSTrack) + GPUCA_MEMALIGN;
-  pageLockedHostMem = gpuMem;
-}
+GPUChainITS::GPUChainITS(GPUReconstruction* rec) : GPUChain(rec) {}
 
 int32_t GPUChainITS::Init() { return 0; }
 

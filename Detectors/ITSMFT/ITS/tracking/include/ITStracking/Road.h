@@ -45,14 +45,14 @@ class Road final
   GPUhd() void resetRoad()
   {
     for (int i = 0; i < maxRoadSize; i++) {
-      mCellIds[i] = constants::its::UnusedIndex;
+      mCellIds[i] = constants::UnusedIndex;
     }
     mRoadSize = 0;
   }
 
   GPUhd() void addCell(int cellLayer, int cellId)
   {
-    if (mCellIds[cellLayer] == constants::its::UnusedIndex) {
+    if (mCellIds[cellLayer] == constants::UnusedIndex) {
       ++mRoadSize;
     }
 
@@ -60,8 +60,7 @@ class Road final
   }
 
  private:
-  int mCellIds[maxRoadSize]{constants::its::UnusedIndex};
-  // int mLabel;
+  int mCellIds[maxRoadSize]{constants::UnusedIndex};
   unsigned char mRoadSize{0};
   bool mIsFakeRoad{false};
 };

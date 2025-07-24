@@ -133,6 +133,7 @@ o2_add_library(Framework
                        src/TableConsumer.cxx
                        src/TableTreeHelpers.cxx
                        src/TopologyPolicy.cxx
+                       src/TopologyPolicyHelpers.cxx
                        src/TextDriverClient.cxx
                        src/TimesliceIndex.cxx
                        src/TimingHelpers.cxx
@@ -248,6 +249,7 @@ add_executable(o2-test-framework-core
               test/test_TimeParallelPipelining.cxx
               test/test_TimesliceIndex.cxx
               test/test_TypeTraits.cxx
+              test/test_TopologyPolicies.cxx
               test/test_Variants.cxx
               test/test_WorkflowHelpers.cxx
               test/test_WorkflowSerialization.cxx

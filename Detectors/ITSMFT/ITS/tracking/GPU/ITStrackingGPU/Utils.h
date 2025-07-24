@@ -16,12 +16,20 @@
 #ifndef ITSTRACKINGGPU_UTILS_H_
 #define ITSTRACKINGGPU_UTILS_H_
 
-#include "GPUCommonDef.h"
+#include <vector>
 
-namespace o2
+#include "GPUCommonDef.h"
+#include "GPUCommonHelpers.h"
+
+#ifndef __HIPCC__
+#define THRUST_NAMESPACE thrust::cuda
+#else
+#define THRUST_NAMESPACE thrust::hip
+#endif
+
+namespace o2::its
 {
-namespace its
-{
+
 template <typename T1, typename T2>
 struct gpuPair {
   T1 first;
@@ -30,11 +38,6 @@ struct gpuPair {
 
 namespace gpu
 {
-
-template <typename T>
-void discardResult(const T&)
-{
-}
 
 // Poor man implementation of a span-like struct. It is very limited.
 template <typename T>
@@ -85,19 +88,74 @@ enum class Task {
   Vertexer = 1
 };
 
-template <class T>
-GPUhd() T* getPtrFromRuler(int index, T* src, const int* ruler, const int stride = 1)
+// Abstract stream class
+class Stream
 {
-  return src + ruler[index] * stride;
-}
+ public:
+#if defined(__HIPCC__)
+  using Handle = hipStream_t;
+  static constexpr Handle Default = 0;
+#elif defined(__CUDACC__)
+  using Handle = cudaStream_t;
+  static constexpr Handle Default = 0;
+#else
+  using Handle = void*;
+  static constexpr Handle Default = nullptr;
+#endif
 
-template <class T>
-GPUhd() const T* getPtrFromRuler(int index, const T* src, const int* ruler, const int stride = 1)
+  Stream(unsigned int flags = 0)
+  {
+#if defined(__HIPCC__)
+    GPUChkErrS(hipStreamCreateWithFlags(&mHandle, flags));
+#elif defined(__CUDACC__)
+    GPUChkErrS(cudaStreamCreateWithFlags(&mHandle, flags));
+#endif
+  }
+
+  Stream(Handle h) : mHandle(h) {}
+  ~Stream()
+  {
+    if (mHandle != Default) {
+#if defined(__HIPCC__)
+      GPUChkErrS(hipStreamDestroy(mHandle));
+#elif defined(__CUDACC__)
+      GPUChkErrS(cudaStreamDestroy(mHandle));
+#endif
+    }
+  }
+
+  operator bool() const { return mHandle != Default; }
+  const Handle& get() { return mHandle; }
+  void sync() const
+  {
+#if defined(__HIPCC__)
+    GPUChkErrS(hipStreamSynchronize(mHandle));
+#elif defined(__CUDACC__)
+    GPUChkErrS(cudaStreamSynchronize(mHandle));
+#endif
+  }
+
+ private:
+  Handle mHandle{Default};
+};
+static_assert(sizeof(Stream) == sizeof(void*), "Stream type must match pointer type!");
+
+// Abstract vector for streams.
+// Handles specifically wrap around.
+class Streams
 {
-  return src + ruler[index] * stride;
-}
+ public:
+  size_t size() const noexcept { return mStreams.size(); }
+  void resize(size_t n) { mStreams.resize(n); }
+  void clear() { mStreams.clear(); }
+  auto& operator[](size_t i) { return mStreams[i % mStreams.size()]; }
+  void push_back(const Stream& stream) { mStreams.push_back(stream); }
+
+ private:
+  std::vector<Stream> mStreams;
+};
+
 } // namespace gpu
-} // namespace its
-} // namespace o2
+} // namespace o2::its
 
 #endif

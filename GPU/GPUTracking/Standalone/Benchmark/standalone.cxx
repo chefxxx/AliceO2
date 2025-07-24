@@ -765,9 +765,9 @@ int32_t main(int argc, char** argv)
     chainTrackingPipeline->SetQAFromForeignChain(chainTracking);
   }
   if (!configStandalone.proc.doublePipeline) {
-    chainITS = rec->AddChain<GPUChainITS>(0);
+    chainITS = rec->AddChain<GPUChainITS>();
     if (configStandalone.testSyncAsync) {
-      chainITSAsync = recAsync->AddChain<GPUChainITS>(0);
+      chainITSAsync = recAsync->AddChain<GPUChainITS>();
     }
   }
 

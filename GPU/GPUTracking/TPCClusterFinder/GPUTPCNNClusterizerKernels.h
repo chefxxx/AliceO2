@@ -38,8 +38,8 @@ class GPUTPCNNClusterizerKernels : public GPUKernelTemplate
 {
  public:
   // Must all have same number of threads, since they use a common SCRATCH_PAD_WORK_GROUP_SIZE below
-  static_assert(GPUCA_GET_THREAD_COUNT(GPUCA_LB_GPUTPCNNClusterizerKernels_fillInputNN) == GPUCA_GET_THREAD_COUNT(GPUCA_LB_GPUTPCNNClusterizerKernels_runCfClusterizer));
-  static_assert(GPUCA_GET_THREAD_COUNT(GPUCA_LB_GPUTPCNNClusterizerKernels_fillInputNNSingleElement) == GPUCA_GET_THREAD_COUNT(GPUCA_LB_GPUTPCNNClusterizerKernels_runCfClusterizer));
+  static_assert(GPUCA_GET_THREAD_COUNT(GPUCA_LB_GPUTPCNNClusterizerKernels_fillInputNNCPU) == GPUCA_GET_THREAD_COUNT(GPUCA_LB_GPUTPCNNClusterizerKernels_runCfClusterizer));
+  static_assert(GPUCA_GET_THREAD_COUNT(GPUCA_LB_GPUTPCNNClusterizerKernels_fillInputNNGPU) == GPUCA_GET_THREAD_COUNT(GPUCA_LB_GPUTPCNNClusterizerKernels_runCfClusterizer));
   static_assert(GPUCA_GET_THREAD_COUNT(GPUCA_LB_GPUTPCNNClusterizerKernels_determineClass1Labels) == GPUCA_GET_THREAD_COUNT(GPUCA_LB_GPUTPCNNClusterizerKernels_runCfClusterizer));
   static_assert(GPUCA_GET_THREAD_COUNT(GPUCA_LB_GPUTPCNNClusterizerKernels_determineClass2Labels) == GPUCA_GET_THREAD_COUNT(GPUCA_LB_GPUTPCNNClusterizerKernels_runCfClusterizer));
   static_assert(GPUCA_GET_THREAD_COUNT(GPUCA_LB_GPUTPCNNClusterizerKernels_publishClass1Regression) == GPUCA_GET_THREAD_COUNT(GPUCA_LB_GPUTPCNNClusterizerKernels_runCfClusterizer));
@@ -59,13 +59,13 @@ class GPUTPCNNClusterizerKernels : public GPUKernelTemplate
 
   enum K : int32_t {
     runCfClusterizer = 0,
-    fillInputNN = 1,
-    fillInputNNSingleElement = 2,
+    fillInputNNCPU = 1,
+    fillInputNNGPU = 2,
     determineClass1Labels = 3,
     determineClass2Labels = 4,
     publishClass1Regression = 5,
     publishClass2Regression = 6,
-    publishDeconvolutionFlags = 7
+    publishDeconvolutionFlags = 7,
   };
 
   template <int32_t iKernel = defaultKernel, typename... Args>

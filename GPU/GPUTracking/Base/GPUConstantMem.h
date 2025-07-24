@@ -26,7 +26,6 @@
 #include "GPUTPCConvert.h"
 #include "GPUTPCCompression.h"
 #include "GPUTPCDecompression.h"
-#include "GPUITSFitter.h"
 #include "GPUTPCClusterFinder.h"
 #include "GPUTrackingRefit.h"
 
@@ -50,7 +49,6 @@ struct GPUConstantMem {
   GPUTRDTrackerGPU trdTrackerGPU;
   GPUTRDTracker trdTrackerO2;
   GPUTPCClusterFinder tpcClusterer[GPUCA_NSECTORS];
-  GPUITSFitter itsFitter;
   GPUTrackingRefitProcessor trackingRefit;
   GPUTrackingInOutPointers ioPtrs;
   GPUCalibObjectsConst calibObjects;

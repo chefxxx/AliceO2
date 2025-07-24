@@ -173,8 +173,6 @@ set(SRCS_NO_CINT ${SRCS_NO_CINT} display/GPUDisplayInterface.cxx)
 
 set(SRCS_NO_CINT ${SRCS_NO_CINT}
     Global/GPUChainITS.cxx
-    ITS/GPUITSFitter.cxx
-    ITS/GPUITSFitterKernels.cxx
     dEdx/GPUdEdx.cxx
     TPCConvert/GPUTPCConvert.cxx
     TPCConvert/GPUTPCConvertKernel.cxx
@@ -220,7 +218,6 @@ set(SRCS_NO_H ${SRCS_NO_H}
     TPCClusterFinder/GPUTPCClusterFinderDump.cxx)
 
 set(HDRS_INSTALL ${HDRS_INSTALL}
-                  ITS/GPUITSTrack.h
                   TPCClusterFinder/CfArray2D.h
                   TPCClusterFinder/CfConsts.h
                   TPCClusterFinder/CfFragment.h
@@ -298,7 +295,6 @@ set(INCDIRS
     ${CMAKE_CURRENT_SOURCE_DIR}/SectorTracker
     ${CMAKE_CURRENT_SOURCE_DIR}/TPCConvert
     ${CMAKE_CURRENT_SOURCE_DIR}/dEdx
-    ${CMAKE_CURRENT_SOURCE_DIR}/ITS
     ${CMAKE_CURRENT_SOURCE_DIR}/TRDTracking
     ${CMAKE_CURRENT_SOURCE_DIR}/qa
     ${CMAKE_CURRENT_SOURCE_DIR}/Global

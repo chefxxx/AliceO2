@@ -209,7 +209,7 @@ static uint32_t getDefaultNThreads()
   const char* ompEnv = getenv("OMP_NUM_THREADS");
   uint32_t ompNum = ompEnv ? atoi(ompEnv) : 0;
   if (ompNum) {
-    return tbbNum;
+    return ompNum;
   }
   return tbb::info::default_concurrency();
 }

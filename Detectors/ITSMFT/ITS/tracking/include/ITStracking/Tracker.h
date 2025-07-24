@@ -32,7 +32,6 @@
 #include "ITStracking/Configuration.h"
 #include "CommonConstants/MathConstants.h"
 #include "ITStracking/Definitions.h"
-#include "ITStracking/ROframe.h"
 #include "ITStracking/MathUtils.h"
 #include "ITStracking/TimeFrame.h"
 #include "ITStracking/TrackerTraits.h"
@@ -71,9 +70,7 @@ class Tracker
   void setParameters(const std::vector<TrackingParameters>& p) { mTrkParams = p; }
   void setMemoryPool(std::shared_ptr<BoundedMemoryResource>& pool) { mMemoryPool = pool; }
   std::vector<TrackingParameters>& getParameters() { return mTrkParams; }
-  void getGlobalConfiguration();
   void setBz(float bz) { mTraits->setBz(bz); }
-  void setCorrType(const o2::base::PropagatorImpl<float>::MatCorrType type) { mTraits->setCorrType(type); }
   bool isMatLUT() const { return mTraits->isMatLUT(); }
   void setNThreads(int n, std::shared_ptr<tbb::task_arena>& arena) { mTraits->setNThreads(n, arena); }
   void printSummary() const;

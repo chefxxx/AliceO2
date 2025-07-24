@@ -31,11 +31,6 @@ constexpr int UnusedIndex{-1};
 constexpr float Resolution{0.0005f};
 constexpr float Radl = 9.36f; // Radiation length of Si [cm]
 constexpr float Rho = 2.33f;  // Density of Si [g/cm^3]
-namespace its                 // to be removed
-{
-constexpr int UnusedIndex{-1};
-constexpr float Resolution{0.0005f};
-} // namespace its
 } // namespace o2::its::constants
 
 #endif /* TRACKINGITSU_INCLUDE_CONSTANTS_H_ */

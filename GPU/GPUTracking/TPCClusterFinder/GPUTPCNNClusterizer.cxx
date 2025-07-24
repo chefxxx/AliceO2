@@ -65,33 +65,6 @@ void* GPUTPCNNClusterizer::setIOPointers(void* mem)
   return mem;
 }
 
-// std::vector<int32_t> GPUTPCNNClusterizer::pointerSizes() {
-//   std::vector<int32_t> sizes(7, -1);
-//   if (mNnClusterizerBatchedMode > 0) {
-//     if (mNnInferenceInputDType == 0 && mNnClusterizerElementSize > 0) {
-//       sizes[0] = mNnClusterizerBatchedMode * mNnClusterizerElementSize; // inputData16
-//     } else if (mNnInferenceInputDType == 1 && mNnClusterizerElementSize > 0) {
-//       sizes[1] = mNnClusterizerBatchedMode * mNnClusterizerElementSize; // inputData32
-//     }
-//     sizes[2] = 2 * mNnClusterizerBatchedMode; // mClusterFlags
-//     if (mNnClusterizerModelClassNumOutputNodes > 0) {
-//       sizes[3] = mNnClusterizerBatchedMode * mNnClusterizerModelClassNumOutputNodes; // modelProbabilities
-//     }
-//     if (!mNnClusterizerUseCfRegression) {
-//       if (mNnClusterizerModelReg1NumOutputNodes > 0) {
-//         sizes[4] = mNnClusterizerBatchedMode * mNnClusterizerModelReg1NumOutputNodes; // outputDataReg1
-//       }
-//       if (mNnClusterizerModelReg2NumOutputNodes > 0) {
-//         sizes[5] = mNnClusterizerBatchedMode * mNnClusterizerModelReg2NumOutputNodes; // outputDataReg2
-//       }
-//     }
-//   }
-//   if (mNnClusterizerTotalClusters > 0) {
-//     sizes[6] = mNnClusterizerTotalClusters; // mOutputDataClass
-//   }
-//   return sizes;
-// }
-
 void GPUTPCNNClusterizer::RegisterMemoryAllocation()
 {
   AllocateAndInitializeLate();

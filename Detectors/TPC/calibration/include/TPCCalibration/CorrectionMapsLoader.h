@@ -63,6 +63,7 @@ class CorrectionMapsLoader : public o2::gpu::CorrectionMapsHelper
   void init(o2::framework::InitContext& ic);
   void copySettings(const CorrectionMapsLoader& src);
   void updateInverse(); /// recalculate inverse correction
+  float getMapMeanRate(const o2::gpu::TPCFastTransform* mp, bool lumiOverridden) const;
 
   static void requestCCDBInputs(std::vector<o2::framework::InputSpec>& inputs, std::vector<o2::framework::ConfigParamSpec>& options, const CorrectionMapsLoaderGloOpts& gloOpts);
   static void addGlobalOptions(std::vector<o2::framework::ConfigParamSpec>& options);

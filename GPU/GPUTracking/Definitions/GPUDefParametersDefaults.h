@@ -438,9 +438,6 @@
   #ifndef GPUCA_LB_GPUTPCGMO2Output_output
     #define GPUCA_LB_GPUTPCGMO2Output_output 256
   #endif
-  #ifndef GPUCA_LB_GPUITSFitterKernels
-    #define GPUCA_LB_GPUITSFitterKernels 256
-  #endif
   #ifndef GPUCA_LB_GPUTPCStartHitsFinder
     #define GPUCA_LB_GPUTPCStartHitsFinder 256
   #endif
@@ -491,8 +488,8 @@
   #define GPUCA_LB_GPUTPCCFNoiseSuppression_updatePeaks GPUCA_LB_GPUTPCCFNoiseSuppression
 
   #define GPUCA_LB_GPUTPCNNClusterizerKernels_runCfClusterizer GPUCA_LB_GPUTPCNNClusterizerKernels
-  #define GPUCA_LB_GPUTPCNNClusterizerKernels_fillInputNN GPUCA_LB_GPUTPCNNClusterizerKernels
-  #define GPUCA_LB_GPUTPCNNClusterizerKernels_fillInputNNSingleElement GPUCA_LB_GPUTPCNNClusterizerKernels
+  #define GPUCA_LB_GPUTPCNNClusterizerKernels_fillInputNNCPU GPUCA_LB_GPUTPCNNClusterizerKernels
+  #define GPUCA_LB_GPUTPCNNClusterizerKernels_fillInputNNGPU GPUCA_LB_GPUTPCNNClusterizerKernels
   #define GPUCA_LB_GPUTPCNNClusterizerKernels_determineClass1Labels GPUCA_LB_GPUTPCNNClusterizerKernels
   #define GPUCA_LB_GPUTPCNNClusterizerKernels_determineClass2Labels GPUCA_LB_GPUTPCNNClusterizerKernels
   #define GPUCA_LB_GPUTPCNNClusterizerKernels_publishClass1Regression GPUCA_LB_GPUTPCNNClusterizerKernels

@@ -122,8 +122,8 @@ fi
 DIGITOPT=
 DIGITOPTKEYTRD="TRDSimParams.digithreads=${NJOBS};"
 DIGITOPTKEY=${HBFUTILPARAMS}
-[[ ! -z $ITS_STROBE ]] && DIGITOPTKEY+="ITSAlpideParam.roFrameLengthInBC=$ITS_STROBE;"
-[[ ! -z $MFT_STROBE ]] && DIGITOPTKEY+="MFTAlpideParam.roFrameLengthInBC=$MFT_STROBE;"
+[[ -n $ITS_STROBE ]] && DIGITOPTKEY+="ITSAlpideParam.roFrameLengthInBC=$ITS_STROBE;"
+[[ -n $MFT_STROBE ]] && DIGITOPTKEY+="MFTAlpideParam.roFrameLengthInBC=$MFT_STROBE;"
 if [ $SPLITTRDDIGI == "1" ]; then
   DIGITOPT+=" --skipDet TRD"
   DIGITOPTKEYTRD+=${HBFUTILPARAMS}
@@ -202,7 +202,7 @@ STAGES+=" ASYNC"
 if [[ ${RANS_OPT:-} =~ (--ans-version +)(compat) ]] ; then
   # Give a possibility to run the FST with external existing dictionary (i.e. with CREATECTFDICT=0 full_system_test.sh)
   # In order to use CCDB dictionaries, pass CTFDICTFILE=ccdb CREATECTFDICT=0
-  [[ ! -z "$CREATECTFDICT" ]] && SYNCMODEDOCTFDICT="$CREATECTFDICT" || SYNCMODEDOCTFDICT=1
+  [[ -n "$CREATECTFDICT" ]] && SYNCMODEDOCTFDICT="$CREATECTFDICT" || SYNCMODEDOCTFDICT=1
 
   # this is default local tree-based CTF dictionary file
   [[ -z "$CTFDICTFILE" ]] && CTFDICTFILE="ctf_dictionary.root"

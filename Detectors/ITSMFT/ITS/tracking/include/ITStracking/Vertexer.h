@@ -25,19 +25,12 @@
 
 #include <oneapi/tbb/task_arena.h>
 
-#include "ITStracking/ROframe.h"
 #include "ITStracking/Constants.h"
 #include "ITStracking/Configuration.h"
 #include "ITStracking/TimeFrame.h"
 #include "ITStracking/VertexerTraits.h"
 #include "ITStracking/BoundedAllocator.h"
 #include "ReconstructionDataFormats/Vertex.h"
-
-#include "ITStracking/ClusterLines.h"
-#include "ITStracking/Tracklet.h"
-#include "ITStracking/Cluster.h"
-
-#include "GPUCommonLogger.h"
 
 namespace o2::its
 {
@@ -60,7 +53,6 @@ class Vertexer
   auto& getVertParameters() const { return mTraits->getVertexingParameters(); }
   void setParameters(const std::vector<VertexingParameters>& vertParams) { mVertParams = vertParams; }
   const auto& getParameters() const noexcept { return mVertParams; }
-  void getGlobalConfiguration();
   void setMemoryPool(std::shared_ptr<BoundedMemoryResource>& pool) { mMemoryPool = pool; }
 
   std::vector<Vertex> exportVertices();
@@ -76,7 +68,8 @@ class Vertexer
   void validateTracklets(T&&... args);
   template <typename... T>
   void findVertices(T&&... args);
-  void findHistVertices();
+
+  void addTruthSeeds() { mTraits->addTruthSeedingVertices(); }
 
   template <typename... T>
   void initialiseVertexer(T&&... args);
@@ -109,10 +102,11 @@ class Vertexer
     Trackleting,
     Validating,
     Finding,
+    TruthSeeding,
     NStates,
   };
   State mCurState{Init};
-  static constexpr std::array<const char*, NStates> StateNames{"Initialisation", "Tracklet finding", "Tracklet validation", "Vertex finding"};
+  static constexpr std::array<const char*, NStates> StateNames{"Initialisation", "Tracklet finding", "Tracklet validation", "Vertex finding", "Truth seeding"};
 };
 
 template <typename... T>

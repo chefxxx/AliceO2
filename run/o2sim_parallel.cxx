@@ -762,9 +762,8 @@ int main(int argc, char* argv[])
   // Handle mergerpid status separately
   if (cpid == mergerpid) {
     if (WIFEXITED(status)) {
-      // anything other than 128 is indicative of error
-      if (WEXITSTATUS(status) != 128) {
-        LOG(error) << "Merger process exited with abnormal code " << WEXITSTATUS(status);
+      if (WEXITSTATUS(status) != 0 || WEXITSTATUS(status) != 128) {
+        LOG(error) << "Merger process exited with abnormal exit status " << WEXITSTATUS(status);
         errored = true;
       }
     } else if (WIFSIGNALED(status)) {
