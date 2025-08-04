@@ -186,6 +186,9 @@ target_include_directories(${targetName} PUBLIC $<BUILD_INTERFACE:${CMAKE_SOURCE
 o2_target_root_dictionary(Framework
                           HEADERS test/TestClasses.h
                           include/Framework/StepTHn.h
+			  include/Framework/EventMixing2/lib/Overlays.h
+			  include/Framework/EventMixing2/lib/Helpers.h
+		          include/Framework/EventMixing2/lib/BucketPolicy.h 	
                           LINKDEF test/FrameworkCoreTestLinkDef.h)
 
 add_executable(o2-test-framework-core
