@@ -327,8 +327,9 @@ void StepTHn::createTarget(Int_t step, Bool_t sparse)
   }
 
   THnBase* target = mTarget[step];
-  if (mSumw2[step])
+  if (mSumw2[step]) {
     target->Sumw2();
+  }
 
   Int_t* binIdx = new Int_t[mNVars];
   Int_t* nBins = new Int_t[mNVars];

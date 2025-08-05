@@ -108,9 +108,6 @@ EVE_OPT=" --jsons-folder $EDJSONS_DIR"
 
 [[ "0$DISABLE_ROOT_OUTPUT" == "00" ]] && DISABLE_ROOT_OUTPUT=
 
-has_detectors_gpu TPC ITS && GPU_INPUT+=",its-clusters"
-has_detectors_gpu TPC ITS && GPU_OUTPUT+=",its-tracks"
-
 if [[ $CTFINPUT != 1 ]]; then
   GPU_OUTPUT+=",tpc-triggers"
 fi
@@ -275,7 +272,8 @@ if [[ $GPUTYPE == "HIP" ]]; then
     GPU_CONFIG+=" --environment \"ROCR_VISIBLE_DEVICES={timeslice${TIMESLICEOFFSET}}\""
   fi
   # serialization workaround for MI100 nodes: remove it again if the problem will be fixed in ROCm, then also remove the DISABLE_MI100_SERIALIZATION flag in the O2DPG parse script
-  [[ $EPNSYNCMODE == 1 || -n ${OPTIMIZED_PARALLEL_ASYNC:-} ]] && [[ ${EPN_NODE_MI100:-} == "1" ]] && [[ ${DISABLE_MI100_SERIALIZATION:-0} != 1 ]] && GPU_CONFIG_KEY+="GPU_proc.amdMI100SerializationWorkaround=1;"
+  [[ $EPNSYNCMODE == 1 ]] && [[ ${EPN_NODE_MI100:-} == "1" ]] && [[ ${DISABLE_MI100_SERIALIZATION:-0} != 1 ]] && GPU_CONFIG_KEY+="GPU_proc.amdMI100SerializationWorkaround=1;"
+  [[ -n ${OPTIMIZED_PARALLEL_ASYNC:-} ]] && [[ ${EPN_NODE_MI100:-} == "1" ]] && [[ ${DISABLE_MI100_SERIALIZATION:-0} != 1 ]] && GPU_CONFIG_KEY+="GPU_proc.serializeGPU=3;"
   #export HSA_TOOLS_LIB=/opt/rocm/lib/librocm-debug-agent.so.2
 else
   GPU_CONFIG_KEY+="GPU_proc.deviceNum=-2;"
@@ -421,6 +419,17 @@ if [[ -n ${WORKFLOW_DETECTORS_USE_GLOBAL_READER_TRACKS} ]] || [[ -n ${WORKFLOW_D
   has_detector TOF && has_detector_from_global_reader TOF && add_W o2-tof-reco-workflow "$DISABLE_MC --input-type digits --output-type NONE $HBFINI_OPTIONS"
 fi
 
+if [[ ${ITSMFT_RECO_RERUN_CLUSTERIZER:-0} == 1 && ${DISABLE_DIGIT_CLUSTER_INPUT:-} =~ "--digits-from-upstream" ]]; then
+  echo "Cannot set both ITSMFT_RECO_RERUN_CLUSTERIZER and DISABLE_DIGIT_CLUSTER_INPUT at the same time"
+  echo "DISABLE_DIGIT_CLUSTER_INPUT will be removed once used in O2DPG"
+  exit 1
+fi
+if [[ ${ITSMFT_RECO_RERUN_CLUSTERIZER:-0} == 1 ]]; then
+  has_detector_reco MFT && ARGS_EXTRA_PROCESS_o2_ctf_reader_workflow+=' --mft-digits '
+  ( has_detector_reco ITS || has_detector_gpu ITS ) && ARGS_EXTRA_PROCESS_o2_ctf_reader_workflow+=' --its-digits '
+  DISABLE_DIGIT_CLUSTER_INPUT="--digits-from-upstream"
+fi
+
 if [[ -n $INPUT_DETECTOR_LIST ]]; then
   if [[ $CTFINPUT == 1 ]]; then
     GPU_INPUT=compressed-clusters-ctf
@@ -490,7 +499,6 @@ if [[ -n $INPUT_DETECTOR_LIST ]]; then
   elif [[ $DIGITINPUT == 1 ]]; then
     [[ $NTIMEFRAMES != 1 ]] && { echo "Digit input works only with NTIMEFRAMES=1" 1>&2; exit 1; }
     DISABLE_DIGIT_ROOT_INPUT=
-    DISABLE_DIGIT_CLUSTER_INPUT=
     TOF_INPUT=digits
     GPU_INPUT=zsonthefly
     has_detector TPC && add_W o2-tpc-reco-workflow "--input-type digits --output-type zsraw,disable-writer $DISABLE_MC --pipeline $(get_N tpc-zsEncoder TPC RAW 1 TPCRAWDEC)"
@@ -543,11 +551,15 @@ if [[ $CTFINPUT == 0 && $DIGITINPUT == 0 ]]; then
   has_detector EMC && ! has_detector_from_global_reader EMC && ! has_detector_flp_processing EMC && add_W o2-emcal-reco-workflow "--input-type raw --output-type cells ${RAW_EMC_SUBSPEC:-} $EMCRAW2C_CONFIG $DISABLE_ROOT_OUTPUT $DISABLE_MC --pipeline $(get_N EMCALRawToCellConverterSpec EMC REST 1 EMCREC)"
 fi
 
+has_detector_gpu ITS && GPU_INPUT+=",its-clusters"
+has_detector_gpu ITS && GPU_OUTPUT+=",its-tracks"
+
 # ---------------------------------------------------------------------------------------------------------------------
 # Common reconstruction workflows
+(has_detector_reco ITS && ! has_detector_gpu ITS) && ! has_detector_from_global_reader ITS && add_W o2-its-reco-workflow "--trackerCA $ITS_CONFIG $DISABLE_MC ${DISABLE_DIGIT_CLUSTER_INPUT:-} $DISABLE_ROOT_OUTPUT --pipeline $(get_N its-tracker ITS REST 1 ITSTRK),$(get_N its-clusterer ITS REST 1 ITSCL)" "$ITS_CONFIG_KEY;$ITSMFT_STROBES;$ITSEXTRAERR"
+[[ ${DISABLE_DIGIT_CLUSTER_INPUT:-} =~ "--digits-from-upstream" ]]  && has_detector_gpu ITS && ! has_detector_from_global_reader ITS && add_W o2-its-reco-workflow "--disable-tracking ${DISABLE_DIGIT_CLUSTER_INPUT:-} $DISABLE_MC $DISABLE_ROOT_OUTPUT --pipeline $(get_N its-clusterer ITS REST 1 ITSCL)" "$ITS_CONFIG_KEY;$ITSMFT_STROBES;$ITSEXTRAERR"
 (has_detector_reco TPC || has_detector_ctf TPC) && ! has_detector_from_global_reader TPC && add_W o2-gpu-reco-workflow "--gpu-reconstruction \"$GPU_CONFIG_SELF\" --input-type=$GPU_INPUT $DISABLE_MC --output-type $GPU_OUTPUT $TPC_CORR_OPT --pipeline gpu-reconstruction:${N_TPCTRK:-1},gpu-reconstruction-prepare:${N_TPCTRK:-1} $GPU_CONFIG" "GPU_global.deviceType=$GPUTYPE;GPU_proc.debugLevel=0;$GPU_CONFIG_KEY;$TRACKTUNETPCINNER;$TPC_CORR_KEY"
 (has_detector_reco TOF || has_detector_ctf TOF) && ! has_detector_from_global_reader TOF && add_W o2-tof-reco-workflow "$TOF_CONFIG --input-type $TOF_INPUT --output-type $TOF_OUTPUT $DISABLE_DIGIT_ROOT_INPUT $DISABLE_ROOT_OUTPUT $DISABLE_MC --pipeline $(get_N tof-compressed-decoder TOF RAW 1),$(get_N TOFClusterer TOF REST 1)"
-(has_detector_reco ITS && ! has_detector_gpu ITS) && ! has_detector_from_global_reader ITS && add_W o2-its-reco-workflow "--trackerCA $ITS_CONFIG $DISABLE_MC $DISABLE_DIGIT_CLUSTER_INPUT $DISABLE_ROOT_OUTPUT --pipeline $(get_N its-tracker ITS REST 1 ITSTRK),$(get_N its-clusterer ITS REST 1 ITSCL)" "$ITS_CONFIG_KEY;$ITSMFT_STROBES;$ITSEXTRAERR"
 has_detector_reco FT0 && ! has_detector_from_global_reader FT0 && add_W o2-ft0-reco-workflow "$DISABLE_DIGIT_ROOT_INPUT $DISABLE_ROOT_OUTPUT $DISABLE_MC --pipeline $(get_N ft0-reconstructor FT0 REST 1)"
 has_detector_reco TRD && ! has_detector_from_global_reader TRD && add_W o2-trd-tracklet-transformer "--disable-irframe-reader $DISABLE_DIGIT_ROOT_INPUT $DISABLE_ROOT_OUTPUT $DISABLE_MC $TRD_FILTER_CONFIG --pipeline $(get_N TRDTRACKLETTRANSFORMER TRD REST 1 TRDTRKTRANS)"
 has_detectors_reco ITS TPC && ! has_detector_from_global_reader_tracks ITS-TPC && has_detector_matching ITSTPC && add_W o2-tpcits-match-workflow "$DISABLE_ROOT_INPUT $DISABLE_ROOT_OUTPUT $DISABLE_MC $SEND_ITSTPC_DTGL  $TPC_CORR_OPT --nthreads $ITSTPC_THREADS --pipeline $(get_N itstpc-track-matcher MATCH REST $ITSTPC_THREADS TPCITS)" "$ITSTPC_CONFIG_KEY;$INTERACTION_TAG_CONFIG_KEY;$ITSMFT_STROBES;$ITSEXTRAERR;$TPC_CORR_KEY"
@@ -559,7 +571,7 @@ has_detectors TPC && [[ -z "$DISABLE_ROOT_OUTPUT" && "${SKIP_TPC_CLUSTERSTRACKS_
 # Reconstruction workflows normally active only in async mode ($LIST_OF_ASYNC_RECO_STEPS), but can be forced via $WORKFLOW_EXTRA_PROCESSING_STEPS
 has_detector MID && ! has_detector_from_global_reader MID && has_processing_step MID_RECO && add_W o2-mid-reco-workflow "$DISABLE_ROOT_OUTPUT $DISABLE_MC --pipeline $(get_N MIDClusterizer MID REST 1),$(get_N MIDTracker MID REST 1)"
 has_detector MCH && ! has_detector_from_global_reader MCH && has_processing_step MCH_RECO && add_W o2-mch-reco-workflow "$DISABLE_DIGIT_ROOT_INPUT $DISABLE_ROOT_OUTPUT $DISABLE_MC --pipeline $(get_N mch-track-finder MCH REST 1 MCHTRK),$(get_N mch-cluster-finder MCH REST 1 MCHCL),$(get_N mch-cluster-transformer MCH REST 1)" "$MCH_CONFIG_KEY"
-has_detector MFT && ! has_detector_from_global_reader MFT && has_processing_step MFT_RECO && add_W o2-mft-reco-workflow "$DISABLE_DIGIT_CLUSTER_INPUT $DISABLE_MC $DISABLE_ROOT_OUTPUT $MFT_CONFIG --pipeline $(get_N mft-tracker MFT REST 1 MFTTRK)" "$MFT_CONFIG_KEY;$ITSMFT_STROBES"
+has_detector MFT && ! has_detector_from_global_reader MFT && has_processing_step MFT_RECO && add_W o2-mft-reco-workflow "$DISABLE_MC ${DISABLE_DIGIT_CLUSTER_INPUT:-} $DISABLE_ROOT_OUTPUT $MFT_CONFIG --pipeline $(get_N mft-tracker MFT REST 1 MFTTRK)" "$MFT_CONFIG_KEY;$ITSMFT_STROBES"
 has_detector FDD && ! has_detector_from_global_reader FDD && has_processing_step FDD_RECO && add_W o2-fdd-reco-workflow "$DISABLE_DIGIT_ROOT_INPUT $DISABLE_ROOT_OUTPUT $DISABLE_MC"
 has_detector FV0 && ! has_detector_from_global_reader FV0 && has_processing_step FV0_RECO && add_W o2-fv0-reco-workflow "$DISABLE_DIGIT_ROOT_INPUT $DISABLE_ROOT_OUTPUT $DISABLE_MC"
 has_detector ZDC && ! has_detector_from_global_reader ZDC && has_processing_step ZDC_RECO && add_W o2-zdc-digits-reco "$DISABLE_DIGIT_ROOT_INPUT $DISABLE_ROOT_OUTPUT $DISABLE_MC"
